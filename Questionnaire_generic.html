@@ -95,39 +95,48 @@
   </form>
 
   <script>
-  function toggleFollowUp(selectElement, followUpId) {
-    const followUp = document.getElementById(followUpId);
-    if (
-      selectElement.value === 'no' ||
-      selectElement.value === 'incorrect' ||
-      selectElement.value === 'has_mods'
-    ) {
-      followUp.style.display = 'block';
-    } else {
-      followUp.style.display = 'none';
+    function toggleFollowUp(selectElement, followUpId) {
+      const followUp = document.getElementById(followUpId);
+      if (
+        selectElement.value === 'no' ||
+        selectElement.value === 'incorrect' ||
+        selectElement.value === 'has_mods'
+      ) {
+        followUp.style.display = 'block';
+      } else {
+        followUp.style.display = 'none';
+      }
     }
-  }
 
-  document.getElementById('vehicleForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const data = {};
-    formData.forEach((value, key) => {
-      data[key] = value;
+    document.getElementById('vehicleForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+
+      // Try to send the close signal via postMessage
+      window.parent.postMessage(
+        {
+          type: "form:submitted",
+          data: data,
+          close: true
+        },
+        "*"
+      );
+
+      // Also show manual close fallback in case auto-close fails
+      const form = document.getElementById('vehicleForm');
+      form.innerHTML = `
+        <h2>Thank you!</h2>
+        <p>Your information has been submitted.</p>
+        <button onclick="window.parent.postMessage({ type: 'form:submitted', close: true }, '*')">
+          Close
+        </button>
+      `;
     });
-
-    // Send data and trigger auto-close
-    window.parent.postMessage(
-      {
-        type: "form:submitted",
-        data: data,
-        close: true
-      },
-      "*"
-    );
-  });
-</script>
-
+  </script>
 
 </body>
 </html>
