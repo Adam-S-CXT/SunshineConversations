@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Info Confirmation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+    }
+    form {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      max-width: 600px;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+    .follow-up {
+      margin-left: 20px;
+      margin-top: 5px;
+      display: none;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="vehicleForm">
+    <h2>Vehicle Info Confirmation</h2>
+
+    <!-- Tax Status -->
+    <label>Is your vehicle taxed and not currently SORN/off the road?</label>
+    <select name="tax_status" onchange="toggleFollowUp(this, 'taxFollowUp')">
+      <option value="">Select an option</option>
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
+    </select>
+    <div id="taxFollowUp" class="follow-up">
+      <label>Please provide more details about the vehicle's status:</label>
+      <textarea name="tax_details" rows="3"></textarea>
+    </div>
+
+    <!-- Mileage Confirmation -->
+    <label>The mileage we have is 48,500. Is this correct?</label>
+    <select name="mileage_correct" onchange="toggleFollowUp(this, 'mileageFollowUp')">
+      <option value="">Select an option</option>
+      <option value="correct">Correct</option>
+      <option value="incorrect">Incorrect</option>
+    </select>
+    <div id="mileageFollowUp" class="follow-up">
+      <label>Please enter the correct mileage:</label>
+      <input type="text" name="correct_mileage">
+    </div>
+
+    <!-- Modifications -->
+    <label>Does the vehicle have any modifications beyond the standard factory specification?</label>
+    <select name="modifications" onchange="toggleFollowUp(this, 'modFollowUp')">
+      <option value="">Select an option</option>
+      <option value="no_mods">No</option>
+      <option value="has_mods">Yes</option>
+    </select>
+    <div id="modFollowUp" class="follow-up">
+      <label>Please describe the modifications:</label>
+      <textarea name="modification_details" rows="3"></textarea>
+    </div>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    function toggleFollowUp(selectElement, followUpId) {
+      const followUp = document.getElementById(followUpId);
+      if (selectElement.value === 'no' || selectElement.value === 'incorrect' || selectElement.value === 'has_mods') {
+        followUp.style.display = 'block';
+      } else {
+        followUp.style.display = 'none';
+      }
+    }
+
+    document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+      console.log('Form submission:', data);
+      alert('Thank you! Your information has been submitted.');
+    });
+  </script>
+
+</body>
+</html>
