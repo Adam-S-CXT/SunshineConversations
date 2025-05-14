@@ -112,11 +112,7 @@
     data[key] = value;
   });
 
-  // Show thank-you message
-  const form = document.getElementById('vehicleForm');
-  form.innerHTML = "<h2>Thank you!</h2><p>Your information has been submitted.</p>";
-
-  // Send form data (optional)
+  // Immediately close the extension and pass the data
   window.parent.postMessage(
     {
       type: "form:submitted",
@@ -124,16 +120,6 @@
     },
     "*"
   );
-
-  // Close the extension after 2 seconds
-  setTimeout(() => {
-    window.parent.postMessage(
-      {
-        type: "ui.close"
-      },
-      "*"
-    );
-  }, 2000);
 });
 
 
