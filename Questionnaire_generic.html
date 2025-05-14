@@ -104,7 +104,7 @@
       }
     }
 
-    document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+  document.getElementById('vehicleForm').addEventListener('submit', function(e) {
   e.preventDefault();
   const formData = new FormData(e.target);
   const data = {};
@@ -112,10 +112,16 @@
     data[key] = value;
   });
 
-  // Show a confirmation message inside the form
-  const form = document.getElementById('vehicleForm');
-  form.innerHTML = "<h2>Thank you!</h2><p>Your information has been submitted.</p>";
+  // Send message to Zendesk parent to indicate form completion
+  window.parent.postMessage(
+    {
+      type: "form:submitted",
+      data: data
+    },
+    "*"
+  );
 });
+
 
   </script>
 
