@@ -95,14 +95,18 @@
   </form>
 
   <script>
-    function toggleFollowUp(selectElement, followUpId) {
-      const followUp = document.getElementById(followUpId);
-      if (selectElement.value === 'no' || selectElement.value === 'incorrect' || selectElement.value === 'has_mods') {
-        followUp.style.display = 'block';
-      } else {
-        followUp.style.display = 'none';
-      }
+  function toggleFollowUp(selectElement, followUpId) {
+    const followUp = document.getElementById(followUpId);
+    if (
+      selectElement.value === 'no' ||
+      selectElement.value === 'incorrect' ||
+      selectElement.value === 'has_mods'
+    ) {
+      followUp.style.display = 'block';
+    } else {
+      followUp.style.display = 'none';
     }
+  }
 
   document.getElementById('vehicleForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -112,27 +116,18 @@
       data[key] = value;
     });
 
-    // Send form data (optional for logging purposes)
+    // Send data and trigger auto-close
     window.parent.postMessage(
       {
-        type: 'form:submitted',
-        data: data
+        type: "form:submitted",
+        data: data,
+        close: true
       },
-      '*'
-    );
-
-    // Immediately request to close the extension
-    window.parent.postMessage(
-      {
-        type: 'ui.close'
-      },
-      '*'
+      "*"
     );
   });
+</script>
 
-
-
-  </script>
 
 </body>
 </html>
