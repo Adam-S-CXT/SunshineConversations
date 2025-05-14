@@ -112,15 +112,22 @@
     data[key] = value;
   });
 
-  // Send message to Zendesk parent to indicate form completion
-  window.parent.postMessage(
-    {
-      type: "form:submitted",
-      data: data
-    },
-    "*"
-  );
+  // Show thank-you message
+  const form = document.getElementById('vehicleForm');
+  form.innerHTML = "<h2>Thank you!</h2><p>Your information has been submitted.</p>";
+
+  // Close after short delay
+  setTimeout(() => {
+    window.parent.postMessage(
+      {
+        type: "form:submitted",
+        data: data
+      },
+      "*"
+    );
+  }, 2000);
 });
+
 
 
   </script>
