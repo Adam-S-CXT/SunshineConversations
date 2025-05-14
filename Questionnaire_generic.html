@@ -104,39 +104,31 @@
       }
     }
 
-  document.getElementById('vehicleForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const data = {};
-  formData.forEach((value, key) => {
-    data[key] = value;
-  });
+  document.getElementById('vehicleForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = {};
+    formData.forEach((value, key) => {
+      data[key] = value;
+    });
 
-  // Show thank-you message
-  const form = document.getElementById('vehicleForm');
-  form.innerHTML = "<h2>Thank you!</h2><p>Your information has been submitted.</p>";
-
-  // Send form data (optional)
-  window.parent.postMessage(
-    {
-      type: "form:submitted",
-      data: data
-    },
-    "*"
-  );
-
-  // Close the extension after 2 seconds
-  setTimeout(() => {
+    // Send form data (optional for logging purposes)
     window.parent.postMessage(
       {
-        type: "ui.close"
+        type: 'form:submitted',
+        data: data
       },
-      "*"
+      '*'
     );
-  }, 2000);
-});
 
-
+    // Immediately request to close the extension
+    window.parent.postMessage(
+      {
+        type: 'ui.close'
+      },
+      '*'
+    );
+  });
 
 
 
