@@ -116,17 +116,26 @@
   const form = document.getElementById('vehicleForm');
   form.innerHTML = "<h2>Thank you!</h2><p>Your information has been submitted.</p>";
 
-  // Close after short delay
+  // Send form data (optional)
+  window.parent.postMessage(
+    {
+      type: "form:submitted",
+      data: data
+    },
+    "*"
+  );
+
+  // Close the extension after 2 seconds
   setTimeout(() => {
     window.parent.postMessage(
       {
-        type: "form:submitted",
-        data: data
+        type: "ui.close"
       },
       "*"
     );
   }, 2000);
 });
+
 
 
 
