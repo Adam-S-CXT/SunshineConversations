@@ -2,48 +2,81 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Vehicle Info Confirmation</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
-      background-color: #f9f9f9;
+      background-color: #f2f4f7;
+      color: #333;
     }
     form {
       background: #fff;
-      padding: 20px;
+      padding: 24px;
       border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       max-width: 600px;
+      margin: auto;
     }
     h2 {
+      margin-bottom: 24px;
+      color: #0053a0;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+    .form-group {
       margin-bottom: 20px;
     }
     label {
       display: block;
-      margin-top: 15px;
-    }
-    .follow-up {
-      margin-left: 20px;
-      margin-top: 5px;
-      display: none;
+      font-weight: bold;
+      margin-bottom: 6px;
     }
     input, select, textarea {
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
+      padding: 8px 10px;
+      margin: 0;
       border: 1px solid #ccc;
       border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color .2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+    .follow-up {
+      margin-top: 8px;
+      padding-left: 16px;
+      border-left: 3px solid #007bff;
+      display: none;
+    }
+    .radio-group, .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .radio-group label, .checkbox-group label {
+      font-weight: normal;
+    }
+    .radio-group input, .checkbox-group input {
+      margin-right: 6px;
+    }
+    .range-group input {
+      width: 100%;
     }
     button {
-      margin-top: 20px;
-      padding: 10px 15px;
+      display: block;
+      width: 100%;
+      padding: 12px;
       background-color: #007bff;
       color: white;
       border: none;
       border-radius: 4px;
+      font-size: 1.1rem;
       cursor: pointer;
+      transition: background-color .2s;
     }
     button:hover {
       background-color: #0056b3;
@@ -52,20 +85,19 @@
 
   <!-- Sunshine Conversations / Zendesk Webview SDK loader -->
   <script>
-    ;(function (d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) return;
-      js = d.createElement(s); js.id = id;
-      js.src = "https://static.zdassets.com/conversation-extensions/latest/sdk.js";
-      fjs.parentNode.insertBefore(js, fjs);
-    })(document, "script", "WebviewSdkScript");
+    ;(function(d,s,id){
+      var js,fjs=d.getElementsByTagName(s)[0];
+      if(d.getElementById(id))return;
+      js=d.createElement(s);js.id=id;
+      js.src="https://static.zdassets.com/conversation-extensions/latest/sdk.js";
+      fjs.parentNode.insertBefore(js,fjs);
+    })(document,"script","WebviewSdkScript");
 
-    // Called when the SDK has loaded
     window.webviewSdkInit = function(WebviewSdk) {
       if (WebviewSdk.hasFeature("close")) {
         window.closeExtension = WebviewSdk.close.bind(WebviewSdk);
       } else {
-        console.warn("Close feature not supported on this channel");
+        console.warn("Close not supported on this channel");
       }
     };
   </script>
@@ -76,96 +108,153 @@
     <h2>Vehicle Info Confirmation</h2>
 
     <!-- Tax Status -->
-    <label>Is your vehicle taxed and not currently SORN/off the road?</label>
-    <select name="tax_status" onchange="toggleFollowUp(this, 'taxFollowUp')">
-      <option value="">Select an option</option>
-      <option value="yes">Yes</option>
-      <option value="no">No</option>
-    </select>
-    <div id="taxFollowUp" class="follow-up">
-      <label>Please provide more details about the vehicle's status:</label>
-      <textarea name="tax_details" rows="3"></textarea>
+    <div class="form-group">
+      <label>Is your vehicle taxed and not currently SORN/off the road?</label>
+      <select name="tax_status" onchange="toggleFollowUp(this, 'taxFollowUp')">
+        <option value="">Select an option</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+      <div id="taxFollowUp" class="follow-up">
+        <label>Please provide more details about the vehicle's status:</label>
+        <textarea name="tax_details" rows="3"></textarea>
+      </div>
     </div>
 
     <!-- Mileage Confirmation -->
-    <label>The mileage we have is 48,500. Is this correct?</label>
-    <select name="mileage_correct" onchange="toggleFollowUp(this, 'mileageFollowUp')">
-      <option value="">Select an option</option>
-      <option value="correct">Correct</option>
-      <option value="incorrect">Incorrect</option>
-    </select>
-    <div id="mileageFollowUp" class="follow-up">
-      <label>Please enter the correct mileage:</label>
-      <input type="text" name="correct_mileage">
+    <div class="form-group">
+      <label>The mileage we have is 48,500. Is this correct?</label>
+      <select name="mileage_correct" onchange="toggleFollowUp(this, 'mileageFollowUp')">
+        <option value="">Select an option</option>
+        <option value="correct">Correct</option>
+        <option value="incorrect">Incorrect</option>
+      </select>
+      <div id="mileageFollowUp" class="follow-up">
+        <label>Please enter the correct mileage:</label>
+        <input type="number" name="correct_mileage" min="0" step="1">
+      </div>
     </div>
 
     <!-- Modifications -->
-    <label>Does the vehicle have any modifications beyond the standard factory specification?</label>
-    <select name="modifications" onchange="toggleFollowUp(this, 'modFollowUp')">
-      <option value="">Select an option</option>
-      <option value="no_mods">No</option>
-      <option value="has_mods">Yes</option>
-    </select>
-    <div id="modFollowUp" class="follow-up">
-      <label>Please describe the modifications:</label>
-      <textarea name="modification_details" rows="3"></textarea>
+    <div class="form-group">
+      <label>Does the vehicle have any modifications beyond standard specification?</label>
+      <select name="modifications" onchange="toggleFollowUp(this, 'modFollowUp')">
+        <option value="">Select an option</option>
+        <option value="no_mods">No</option>
+        <option value="has_mods">Yes</option>
+      </select>
+      <div id="modFollowUp" class="follow-up">
+        <label>Please describe the modifications:</label>
+        <textarea name="modification_details" rows="3"></textarea>
+      </div>
     </div>
 
+    <!-- New: Purchase Date -->
+    <div class="form-group">
+      <label>Date of purchase:</label>
+      <input type="date" name="purchase_date">
+    </div>
+
+    <!-- New: Contact Preference (radio buttons) -->
+    <div class="form-group">
+      <label>Preferred follow-up method:</label>
+      <div class="radio-group">
+        <label><input type="radio" name="contact_method" value="email"> Email</label>
+        <label><input type="radio" name="contact_method" value="phone"> Phone</label>
+        <label><input type="radio" name="contact_method" value="none"> No follow-up</label>
+      </div>
+    </div>
+
+    <!-- New: Email field -->
+    <div class="form-group">
+      <label>If email, please enter your address:</label>
+      <input type="email" name="contact_email" placeholder="you@example.com">
+    </div>
+
+    <!-- New: Additional services (checkboxes) -->
+    <div class="form-group">
+      <label>Select any additional services you’re interested in:</label>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="services" value="valet"> Valet parking</label>
+        <label><input type="checkbox" name="services" value="maintenance"> Maintenance plan</label>
+        <label><input type="checkbox" name="services" value="insurance"> Vehicle insurance</label>
+      </div>
+    </div>
+
+    <!-- New: Features multi-select -->
+    <div class="form-group">
+      <label>What features do you like most? (ctrl/cmd-click to pick multiple)</label>
+      <select name="favourite_features" multiple size="4">
+        <option value="gps">Built-in GPS</option>
+        <option value="sunroof">Sunroof</option>
+        <option value="heating">Heated seats</option>
+        <option value="sound">Premium sound</option>
+      </select>
+    </div>
+
+    <!-- New: Upload -->
+    <div class="form-group">
+      <label>Upload a photo of your vehicle’s condition:</label>
+      <input type="file" name="vehicle_photo" accept="image/*">
+    </div>
+
+    <!-- New: Satisfaction slider -->
+    <div class="form-group range-group">
+      <label>How satisfied are you overall? (1 = low, 5 = high)</label>
+      <input type="range" name="satisfaction" min="1" max="5" step="1" value="3">
+    </div>
+
+    <!-- Submit -->
     <button type="submit">Submit</button>
   </form>
 
   <script>
-    function toggleFollowUp(selectElement, followUpId) {
-      const followUp = document.getElementById(followUpId);
+    function toggleFollowUp(selectElem, followUpId) {
+      const el = document.getElementById(followUpId);
       if (
-        selectElement.value === 'no' ||
-        selectElement.value === 'incorrect' ||
-        selectElement.value === 'has_mods'
+        selectElem.value === 'no' ||
+        selectElem.value === 'incorrect' ||
+        selectElem.value === 'has_mods'
       ) {
-        followUp.style.display = 'block';
+        el.style.display = 'block';
       } else {
-        followUp.style.display = 'none';
+        el.style.display = 'none';
       }
     }
 
-    document.getElementById('vehicleForm').addEventListener('submit', function (e) {
+    document.getElementById('vehicleForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      // Collect form data
       const formData = new FormData(e.target);
       const data = {};
-      formData.forEach((value, key) => {
-        data[key] = value;
+      formData.forEach((v,k) => {
+        // handle multi-select and checkboxes
+        if (data[k]) {
+          data[k] = [].concat(data[k], v);
+        } else {
+          data[k] = v;
+        }
       });
 
-      // Extract Sunshine Conversations context
-      const params = new URLSearchParams(window.location.search);
-      const userId = params.get('userId');
-      const conversationId = params.get('conversationId');
-      const payload = { userId, conversationId, ...data };
-
-      // Define a close helper
-      function closeWebview() {
-        if (window.closeExtension) {
-          // SDK close
-          window.closeExtension(
-            () => console.log('Webview closed'),
-            err => console.error('Close failed', err)
-          );
-        } else {
-          // Fallback postMessage
-          window.parent.postMessage({ type: 'form:submitted', data, close: true }, '*');
-        }
+      // Try Sunshine Conversations Webview SDK close
+      if (window.closeExtension) {
+        window.closeExtension(
+          () => console.log('Webview closed'),
+          err => console.error('Close failed', err)
+        );
+      } else {
+        // fallback
+        window.parent.postMessage({ type:'form:submitted', data, close:true }, '*');
       }
 
-      // Immediately close the webview to avoid wait on fetch
-      closeWebview();
-
-      // Send form data to server in background
-      fetch('/form-submitted', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      }).catch(err => console.error('Form submission error', err));
+      // replace with thank-you
+      const form = document.getElementById('vehicleForm');
+      form.innerHTML = `
+        <h2>Thank you!</h2>
+        <p>Your information has been submitted.</p>
+        <button onclick="window.parent.postMessage({ type:'form:submitted', close:true }, '*')">
+          Close
+        </button>
+      `;
     });
   </script>
 
