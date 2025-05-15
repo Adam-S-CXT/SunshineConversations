@@ -49,6 +49,26 @@
       background-color: #0056b3;
     }
   </style>
+
+  <!-- Sunshine Conversations / Zendesk Webview SDK loader -->
+  <script>
+    ;(function (d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://static.zdassets.com/conversation-extensions/latest/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    })(document, "script", "WebviewSdkScript");
+
+    // Called when the SDK has loaded
+    window.webviewSdkInit = function(WebviewSdk) {
+      if (WebviewSdk.hasFeature("close")) {
+        window.closeExtension = WebviewSdk.close.bind(WebviewSdk);
+      } else {
+        console.warn("Close feature not supported on this channel");
+      }
+    };
+  </script>
 </head>
 <body>
 
@@ -116,17 +136,25 @@
         data[key] = value;
       });
 
-      // Try to send the close signal via postMessage
-      window.parent.postMessage(
-        {
-          type: "form:submitted",
-          data: data,
-          close: true
-        },
-        "*"
-      );
+      // Attempt to close via Sunshine Conversations Webview SDK
+      if (window.closeExtension) {
+        window.closeExtension(
+          () => console.log('Webview closed successfully'),
+          err => console.error('Failed to close webview', err)
+        );
+      } else {
+        // Fallback to postMessage if SDK not available
+        window.parent.postMessage(
+          {
+            type: 'form:submitted',
+            data: data,
+            close: true
+          },
+          '*'
+        );
+      }
 
-      // Also show manual close fallback in case auto-close fails
+      // Show a thank-you message and manual close fallback
       const form = document.getElementById('vehicleForm');
       form.innerHTML = `
         <h2>Thank you!</h2>
