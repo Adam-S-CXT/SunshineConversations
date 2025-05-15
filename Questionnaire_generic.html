@@ -81,6 +81,12 @@
     button:hover {
       background-color: #ffffff;
     }
+    .emoji-display {
+      text-align: center;
+      font-size: 2rem;
+      margin-top: 8px;
+    }
+
   </style>
 
   <!-- Sunshine Conversations / Zendesk Webview SDK loader -->
@@ -200,11 +206,22 @@
       <input type="file" name="vehicle_photo" accept="image/*">
     </div>
 
-    <!-- New: Satisfaction slider -->
-    <div class="form-group range-group">
-      <label>How satisfied are you overall? (1 = low, 5 = high)</label>
-      <input type="range" name="satisfaction" min="1" max="5" step="1" value="3">
-    </div>
+    <!-- Satisfaction slider with dynamic emoji -->
+  <div class="form-group range-group">
+    <label for="satisfaction">How satisfied are you overall? (1 = low, 5 = high)</label>
+    <input 
+      type="range" 
+      name="satisfaction" 
+      id="satisfaction"
+      min="1" 
+      max="5" 
+      step="1" 
+      value="3"
+    >
+    <!-- Emoji placeholder -->
+    <div id="satisfactionEmoji" class="emoji-display">😐</div>
+  </div>
+
 
     <!-- Submit -->
     <button type="submit">Submit</button>
@@ -224,6 +241,27 @@
       }
     }
 
+    // map each slider value to an emoji
+    const emojiMap = {
+      1: '😞',
+      2: '😕',
+      3: '😐',
+      4: '🙂',
+      5: '😃'
+    };
+
+    const slider = document.getElementById('satisfaction');
+    const emojiEl = document.getElementById('satisfactionEmoji');
+
+  // update emoji when slider moves
+  slider.addEventListener('input', e => {
+    const val = e.target.value;
+    emojiEl.textContent = emojiMap[val] || '';
+  });
+
+  // initialize on page load
+  emojiEl.textContent = emojiMap[slider.value];
+    
     document.getElementById('vehicleForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const formData = new FormData(e.target);
