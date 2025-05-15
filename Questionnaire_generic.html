@@ -157,33 +157,35 @@
 
     <!-- New: Contact Preference (radio buttons) -->
     <div class="form-group">
-      <label>Preferred follow-up method:</label>
+      <label>Preferred contact method:</label>
       <div class="radio-group">
         <label><input type="radio" name="contact_method" value="email"> Email</label>
         <label><input type="radio" name="contact_method" value="phone"> Phone</label>
-        <label><input type="radio" name="contact_method" value="none"> No follow-up</label>
+        <label><input type="radio" name="contact_method" value="none"> WhatsApp</label>
       </div>
     </div>
 
     <!-- New: Email field -->
     <div class="form-group">
-      <label>If email, please enter your address:</label>
+      <label>Please enter your address:</label>
       <input type="email" name="contact_email" placeholder="you@example.com">
     </div>
 
     <!-- New: Additional services (checkboxes) -->
     <div class="form-group">
-      <label>Select any additional services you’re interested in:</label>
+      <label>How did you hear about Motorway?</label>
       <div class="checkbox-group">
-        <label><input type="checkbox" name="services" value="valet"> Valet parking</label>
-        <label><input type="checkbox" name="services" value="maintenance"> Maintenance plan</label>
-        <label><input type="checkbox" name="services" value="insurance"> Vehicle insurance</label>
+        <label><input type="checkbox" name="services" value="valet"> TV advert</label>
+        <label><input type="checkbox" name="services" value="maintenance"> Radio</label>
+        <label><input type="checkbox" name="services" value="insurance"> Word-of-Mouth</label>
+        <label><input type="checkbox" name="services" value="insurance"> Internet Search</label>
+        <label><input type="checkbox" name="services" value="insurance"> Other</label>
       </div>
     </div>
 
     <!-- New: Features multi-select -->
     <div class="form-group">
-      <label>What features do you like most? (ctrl/cmd-click to pick multiple)</label>
+      <label>What features does your vehicle have? (ctrl/cmd-click to pick multiple)</label>
       <select name="favourite_features" multiple size="4">
         <option value="gps">Built-in GPS</option>
         <option value="sunroof">Sunroof</option>
@@ -194,7 +196,7 @@
 
     <!-- New: Upload -->
     <div class="form-group">
-      <label>Upload a photo of your vehicle’s condition:</label>
+      <label>Upload a photo of your vehicle’s proof of purchase:</label>
       <input type="file" name="vehicle_photo" accept="image/*">
     </div>
 
