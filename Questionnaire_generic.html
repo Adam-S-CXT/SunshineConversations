@@ -137,50 +137,35 @@
         data[key] = value;
       });
 
-      // Extract Sunshine Conversations context from query params
+      // Extract Sunshine Conversations context
       const params = new URLSearchParams(window.location.search);
       const userId = params.get('userId');
       const conversationId = params.get('conversationId');
-
-      // Build payload for backend
       const payload = { userId, conversationId, ...data };
 
-      // POST to your server endpoint to persist and push back into chat
+      // Define a close helper
+      function closeWebview() {
+        if (window.closeExtension) {
+          // SDK close
+          window.closeExtension(
+            () => console.log('Webview closed'),
+            err => console.error('Close failed', err)
+          );
+        } else {
+          // Fallback postMessage
+          window.parent.postMessage({ type: 'form:submitted', data, close: true }, '*');
+        }
+      }
+
+      // Immediately close the webview to avoid wait on fetch
+      closeWebview();
+
+      // Send form data to server in background
       fetch('/form-submitted', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Network response was not ok');
-
-        // Close the webview via SDK or fallback
-        if (window.closeExtension) {
-          window.closeExtension(
-            () => console.log('Webview closed successfully'),
-            err => console.error('Failed to close webview', err)
-          );
-        } else {
-          window.parent.postMessage(
-            { type: 'form:submitted', data: data, close: true },
-            '*'
-          );
-        }
-
-        // Show thank-you message
-        const form = document.getElementById('vehicleForm');
-        form.innerHTML = `
-          <h2>Thank you!</h2>
-          <p>Your information has been submitted.</p>
-          <button onclick="window.parent.postMessage({ type: 'form:submitted', close: true }, '*')">
-            Close
-          </button>
-        `;
-      })
-      .catch(err => {
-        console.error('Form submission failed', err);
-        // Optionally, show an error message or still attempt to close
-      });
+      }).catch(err => console.error('Form submission error', err));
     });
   </script>
 
