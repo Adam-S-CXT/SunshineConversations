@@ -130,39 +130,57 @@
 
     document.getElementById('vehicleForm').addEventListener('submit', function (e) {
       e.preventDefault();
+      // Collect form data
       const formData = new FormData(e.target);
       const data = {};
       formData.forEach((value, key) => {
         data[key] = value;
       });
 
-      // Attempt to close via Sunshine Conversations Webview SDK
-      if (window.closeExtension) {
-        window.closeExtension(
-          () => console.log('Webview closed successfully'),
-          err => console.error('Failed to close webview', err)
-        );
-      } else {
-        // Fallback to postMessage if SDK not available
-        window.parent.postMessage(
-          {
-            type: 'form:submitted',
-            data: data,
-            close: true
-          },
-          '*'
-        );
-      }
+      // Extract Sunshine Conversations context from query params
+      const params = new URLSearchParams(window.location.search);
+      const userId = params.get('userId');
+      const conversationId = params.get('conversationId');
 
-      // Show a thank-you message and manual close fallback
-      const form = document.getElementById('vehicleForm');
-      form.innerHTML = `
-        <h2>Thank you!</h2>
-        <p>Your information has been submitted.</p>
-        <button onclick="window.parent.postMessage({ type: 'form:submitted', close: true }, '*')">
-          Close
-        </button>
-      `;
+      // Build payload for backend
+      const payload = { userId, conversationId, ...data };
+
+      // POST to your server endpoint to persist and push back into chat
+      fetch('/form-submitted', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        // Close the webview via SDK or fallback
+        if (window.closeExtension) {
+          window.closeExtension(
+            () => console.log('Webview closed successfully'),
+            err => console.error('Failed to close webview', err)
+          );
+        } else {
+          window.parent.postMessage(
+            { type: 'form:submitted', data: data, close: true },
+            '*'
+          );
+        }
+
+        // Show thank-you message
+        const form = document.getElementById('vehicleForm');
+        form.innerHTML = `
+          <h2>Thank you!</h2>
+          <p>Your information has been submitted.</p>
+          <button onclick="window.parent.postMessage({ type: 'form:submitted', close: true }, '*')">
+            Close
+          </button>
+        `;
+      })
+      .catch(err => {
+        console.error('Form submission failed', err);
+        // Optionally, show an error message or still attempt to close
+      });
     });
   </script>
 
