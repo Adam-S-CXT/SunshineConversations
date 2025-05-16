@@ -107,29 +107,16 @@
     };
   </script>
 
-  <!-- Smooch Web Messenger SDK -->
+  <!-- Smooch Web Messenger SDK (no secrets needed) -->
+  <script src="https://cdn.smooch.io/web/current/smooch.min.js"></script>
   <script>
-    const INTEGRATION_ID = '64f5a35e7e9cf2bd7bc34a37';  // your Web Messenger integration ID
+    // replace with your real public integrationId
+    const INTEGRATION_ID = "64f5a35e7e9cf2bd7bc34a37";
+
     let smoochReady = false;
-
-    function initSmooch() {
-      Smooch
-        .init({ integrationId: INTEGRATION_ID })
-        .then(() => {
-          console.log('✅ Smooch initialized');
-          smoochReady = true;
-        })
-        .catch(err => console.error('❌ Smooch.init failed:', err));
-    }
-
-    // Inject the SDK script and call init once it's loaded
-    ;(function loadSmoochSDK() {
-      const s = document.createElement('script');
-      s.src = 'https://cdn.smooch.io/web/current/smooch.min.js';
-      s.onload = initSmooch;
-      s.onerror = () => console.error('❌ Failed to load Smooch SDK');
-      document.head.appendChild(s);
-    })();
+    Smooch.init({ integrationId: INTEGRATION_ID })
+      .then(() => { smoochReady = true; })
+      .catch(err => console.error("Smooch.init failed:", err));
   </script>
 </head>
 <body>
@@ -294,25 +281,25 @@
 
       // Build a text summary
       const lines = [];
-      lines.push('Vehicle Info:');
-      lines.push(– Tax: ${data.tax_status} + (data.tax_details ?  (${data.tax_details}) : ''));
-      lines.push(– Mileage: ${data.mileage_correct} + (data.correct_mileage ?  (${data.correct_mileage}) : ''));
-      lines.push(– Mods: ${data.modifications} + (data.modification_details ?  (${data.modification_details}) : ''));
-      if (data.purchase_date)        lines.push(– Purchase date: ${data.purchase_date});
-      if (data.contact_method)       lines.push(– Contact via: ${data.contact_method});
-      if (data.contact_email)        lines.push(– Email: ${data.contact_email});
+      lines.push('📋 Vehicle Info:');
+      lines.push(`– Tax: ${data.tax_status}` + (data.tax_details ? ` (${data.tax_details})` : ''));
+      lines.push(`– Mileage: ${data.mileage_correct}` + (data.correct_mileage ? ` (${data.correct_mileage})` : ''));
+      lines.push(`– Mods: ${data.modifications}` + (data.modification_details ? ` (${data.modification_details})` : ''));
+      if (data.purchase_date)        lines.push(`– Purchase date: ${data.purchase_date}`);
+      if (data.contact_method)       lines.push(`– Contact via: ${data.contact_method}`);
+      if (data.contact_email)        lines.push(`– Email: ${data.contact_email}`);
       if (data.services) {
         const svc = Array.isArray(data.services) ? data.services : [data.services];
-        lines.push(– Heard via: ${svc.join(', ')});
+        lines.push(`– Heard via: ${svc.join(', ')}`);
       }
       if (data.favourite_features) {
         const feats = Array.isArray(data.favourite_features)
           ? data.favourite_features
           : [data.favourite_features];
-        lines.push(– Features: ${feats.join(', ')});
+        lines.push(`– Features: ${feats.join(', ')}`);
       }
-      if (data.vehicle_photo?.name)  lines.push(– Photo: ${data.vehicle_photo.name});
-      if (data.satisfaction)         lines.push(– Satisfaction: ${data.satisfaction}/5);
+      if (data.vehicle_photo?.name)  lines.push(`– Photo: ${data.vehicle_photo.name}`);
+      if (data.satisfaction)         lines.push(`– Satisfaction: ${data.satisfaction}/5`);
       const summary = lines.join('\n');
 
       // 1) Send into chat as a user message
@@ -333,13 +320,13 @@
       }
 
       // 3) Show thank-you UI
-      this.innerHTML = 
+      this.innerHTML = `
         <h2>Thank you!</h2>
         <p>Your information has been submitted.</p>
         <button onclick="window.closeExtension ? window.closeExtension() : window.parent.postMessage({ type:'form:submitted', close:true }, '*')">
           Close
         </button>
-      ;
+      `;
     });
   </script>
 </body>
