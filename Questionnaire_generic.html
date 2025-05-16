@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Vehicle Info Confirmation</title>
   <style>
-    /* …your existing CSS… */
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
@@ -108,218 +107,124 @@
     };
   </script>
 
-  <!-- Smooch Web Messenger SDK loader -->
+  <!-- Smooch Web Messenger SDK - official loader snippet -->
   <script>
-    const INTEGRATION_ID = '64f5a35e7e9cf2bd7bc34a37';  // your Web Messenger integration ID
-    let smoochReady = false;
+  ;(function(window, document, url){
+    window.Smooch = window.Smooch || { _q: [] };
+    window.Smooch.init = function() { window.Smooch._q.push(['init', arguments]); };
+    window.Smooch.on = function()  { window.Smooch._q.push(['on', arguments]); };
 
-    function initSmooch() {
-      Smooch
-        .init({ integrationId: INTEGRATION_ID })
-        .then(() => {
-          console.log('✅ Smooch initialized');
-          smoochReady = true;
-        })
-        .catch(err => {
-          console.error('❌ Smooch.init failed:', err);
-          smoochReady = false;
-        });
-    }
+    var script = document.createElement('script');
+    script.async = true;
+    script.src = url;
+    var first = document.getElementsByTagName('script')[0];
+    first.parentNode.insertBefore(script, first);
+  })(window, document, 'https://cdn.smooch.io/web/current/smooch.min.js');
+  </script>
 
-    ;(function loadSmoochSDK() {
-      const s = document.createElement('script');
-      s.src = 'https://cdn.smooch.io/web/current/smooch.min.js';
-      s.onload = initSmooch;
-      s.onerror = () => {
-        console.error('❌ Failed to load Smooch SDK');
-        smoochReady = false;
-      };
-      document.head.appendChild(s);
-    })();
+  <script>
+    // Initialize once the loader has been injected
+    Smooch.init({
+      integrationId: '64f5a35e7e9cf2bd7bc34a37',
+      region: 'eu-1'
+    })
+    .then(() => {
+      console.log('✅ Smooch initialized');
+      smoochReady = true;
+    })
+    .catch(err => console.error('❌ Smooch.init failed:', err));
   </script>
 </head>
-
 <body>
+
   <form id="vehicleForm">
     <h2>Vehicle Info Confirmation</h2>
-
-    <!-- Tax Status -->
-    <div class="form-group">
-      <label>Is your vehicle taxed and not currently SORN/off the road?</label>
-      <select name="tax_status" onchange="toggleFollowUp(this, 'taxFollowUp')">
-        <option value="">Select an option</option>
-        <option value="yes">Yes</option>
-        <option value="no">No</option>
-      </select>
-      <div id="taxFollowUp" class="follow-up">
-        <label>Please provide more details about the vehicle's status:</label>
-        <textarea name="tax_details" rows="3"></textarea>
-      </div>
-    </div>
-
-    <!-- Mileage Confirmation -->
-    <div class="form-group">
-      <label>The mileage we have is 48,500. Is this correct?</label>
-      <select name="mileage_correct" onchange="toggleFollowUp(this, 'mileageFollowUp')">
-        <option value="">Select an option</option>
-        <option value="correct">Correct</option>
-        <option value="incorrect">Incorrect</option>
-      </select>
-      <div id="mileageFollowUp" class="follow-up">
-        <label>Please enter the correct mileage:</label>
-        <input type="number" name="correct_mileage" min="0" step="1">
-      </div>
-    </div>
-
-    <!-- Modifications -->
-    <div class="form-group">
-      <label>Does the vehicle have any modifications beyond standard specification?</label>
-      <select name="modifications" onchange="toggleFollowUp(this, 'modFollowUp')">
-        <option value="">Select an option</option>
-        <option value="no_mods">No</option>
-        <option value="has_mods">Yes</option>
-      </select>
-      <div id="modFollowUp" class="follow-up">
-        <label>Please describe the modifications:</label>
-        <textarea name="modification_details" rows="3"></textarea>
-      </div>
-    </div>
-
-    <!-- Purchase Date -->
-    <div class="form-group">
-      <label>Date of purchase:</label>
-      <input type="date" name="purchase_date">
-    </div>
-
-    <!-- Contact Preference -->
-    <div class="form-group">
-      <label>Preferred contact method:</label>
-      <div class="radio-group">
-        <label><input type="radio" name="contact_method" value="email"> Email</label>
-        <label><input type="radio" name="contact_method" value="phone"> Phone</label>
-        <label><input type="radio" name="contact_method" value="whatsapp"> WhatsApp</label>
-      </div>
-    </div>
-
-    <!-- Email -->
-    <div class="form-group">
-      <label>Please enter your email address:</label>
-      <input type="email" name="contact_email" placeholder="you@example.com">
-    </div>
-
-    <!-- Referral source -->
-    <div class="form-group">
-      <label>How did you hear about Motorway?</label>
-      <div class="checkbox-group">
-        <label><input type="checkbox" name="services" value="TV advert"> TV advert</label>
-        <label><input type="checkbox" name="services" value="Radio"> Radio</label>
-        <label><input type="checkbox" name="services" value="Word of Mouth"> Word-of-Mouth</label>
-        <label><input type="checkbox" name="services" value="Internet Search"> Internet Search</label>
-        <label><input type="checkbox" name="services" value="Other"> Other</label>
-      </div>
-    </div>
-
-    <!-- Features multi-select -->
-    <div class="form-group">
-      <label>What features does your vehicle have? (Ctrl/Cmd-click for multiple)</label>
-      <select name="favourite_features" multiple size="4">
-        <option value="gps">Built-in GPS</option>
-        <option value="sunroof">Sunroof</option>
-        <option value="heating">Heated seats</option>
-        <option value="sound">Premium sound</option>
-      </select>
-    </div>
-
-    <!-- Photo upload -->
-    <div class="form-group">
-      <label>Upload a photo of your vehicle’s proof of purchase:</label>
-      <input type="file" name="vehicle_photo" accept="image/*">
-    </div>
-
-    <!-- Satisfaction slider + emoji -->
-    <div class="form-group range-group">
-      <label for="satisfaction">How satisfied are you overall? (1 = low, 5 = high)</label>
-      <input type="range" name="satisfaction" id="satisfaction" min="1" max="5" step="1" value="3" />
-      <div id="satisfactionEmoji" class="emoji-display">😐</div>
-    </div>
-
-    <button type="submit">Submit</button>
+    <!-- ... rest of form unchanged ... -->
   </form>
 
   <script>
     function toggleFollowUp(selectElem, followUpId) {
       const el = document.getElementById(followUpId);
-      el.style.display = ['no','incorrect','has_mods'].includes(selectElem.value)
-        ? 'block'
-        : 'none';
+      if (
+        selectElem.value === 'no' ||
+        selectElem.value === 'incorrect' ||
+        selectElem.value === 'has_mods'
+      ) {
+        el.style.display = 'block';
+      } else {
+        el.style.display = 'none';
+      }
     }
 
-    const emojiMap = {1:'😞',2:'😕',3:'😐',4:'🙂',5:'😃'};
+    const emojiMap = { 1:'😞',2:'😕',3:'😐',4:'🙂',5:'😃' };
     const slider = document.getElementById('satisfaction');
     const emojiEl = document.getElementById('satisfactionEmoji');
-    slider.addEventListener('input', e => {
-      emojiEl.textContent = emojiMap[e.target.value] || '';
-    });
+    slider.addEventListener('input', e => emojiEl.textContent = emojiMap[e.target.value]);
     emojiEl.textContent = emojiMap[slider.value];
 
     document.getElementById('vehicleForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
-      // 1) Gather data
+      // Collect form data into an object
       const formData = new FormData(this);
       const data = {};
       formData.forEach((v,k) => {
-        data[k] = data[k] ? [].concat(data[k], v) : v;
+        // coerce repeated keys (checkboxes, multi-select) into arrays
+        if (data[k]) {
+          data[k] = ([]).concat(data[k], v);
+        } else {
+          data[k] = v;
+        }
       });
 
-      // 2) Build summary text
-      const lines = ['📋 Vehicle Info:'];
-      lines.push(`– Tax: ${data.tax_status}` + (data.tax_details ? ` (${data.tax_details})` : ''));
-      lines.push(`– Mileage: ${data.mileage_correct}` + (data.correct_mileage ? ` (${data.correct_mileage})` : ''));
-      lines.push(`– Mods: ${data.modifications}` + (data.modification_details ? ` (${data.modification_details})` : ''));
-      if (data.purchase_date)        lines.push(`– Purchase date: ${data.purchase_date}`);
-      if (data.contact_method)       lines.push(`– Contact via: ${data.contact_method}`);
-      if (data.contact_email)        lines.push(`– Email: ${data.contact_email}`);
+      // Build a text summary
+      const lines = [];
+      lines.push('Vehicle Info:');
+      lines.push(– Tax: ${data.tax_status} + (data.tax_details ?  (${data.tax_details}) : ''));
+      lines.push(– Mileage: ${data.mileage_correct} + (data.correct_mileage ?  (${data.correct_mileage}) : ''));
+      lines.push(– Mods: ${data.modifications} + (data.modification_details ?  (${data.modification_details}) : ''));
+      if (data.purchase_date)        lines.push(– Purchase date: ${data.purchase_date});
+      if (data.contact_method)       lines.push(– Contact via: ${data.contact_method});
+      if (data.contact_email)        lines.push(– Email: ${data.contact_email});
       if (data.services) {
-        const svc = Array.isArray(data.services)?data.services:[data.services];
-        lines.push(`– Heard via: ${svc.join(', ')}`);
+        const svc = Array.isArray(data.services) ? data.services : [data.services];
+        lines.push(– Heard via: ${svc.join(', ')});
       }
       if (data.favourite_features) {
         const feats = Array.isArray(data.favourite_features)
           ? data.favourite_features
           : [data.favourite_features];
-        lines.push(`– Features: ${feats.join(', ')}`);
+        lines.push(– Features: ${feats.join(', ')});
       }
-      if (data.vehicle_photo?.name)  lines.push(`– Photo: ${data.vehicle_photo.name}`);
-      if (data.satisfaction)         lines.push(`– Satisfaction: ${data.satisfaction}/5`);
+      if (data.vehicle_photo?.name)  lines.push(– Photo: ${data.vehicle_photo.name});
+      if (data.satisfaction)         lines.push(– Satisfaction: ${data.satisfaction}/5);
       const summary = lines.join('\n');
 
-      // 3) Try sending via Smooch; fallback to postMessage
-      if (smoochReady && typeof Smooch.sendMessage === 'function') {
+      // 1) Send into chat as a user message
+      if (smoochReady) {
         try {
-          await Smooch.sendMessage({ type:'text', text: summary });
+          await Smooch.sendMessage({ type: 'text', text: summary });
         } catch(err) {
-          console.error('⚠️ Smooch.sendMessage failed:', err);
-          window.parent.postMessage({ type:'form:submitted', data, summary, close:true }, '*');
+          console.error('Failed to send message via Smooch:', err);
         }
-      } else {
-        console.warn('⚠️ Smooch not ready—using fallback');
-        window.parent.postMessage({ type:'form:submitted', data, summary, close:true }, '*');
       }
 
-      // 4) Close the webview
+      // 2) Close the webview
       if (window.closeExtension) {
         window.closeExtension();
+      } else {
+        // fallback postMessage (unlikely to be picked up)
+        window.parent.postMessage({ type:'form:submitted', data, close:true }, '*');
       }
 
-      // 5) Replace with thank-you
-      this.innerHTML = `
+      // 3) Show thank-you UI
+      this.innerHTML = 
         <h2>Thank you!</h2>
         <p>Your information has been submitted.</p>
         <button onclick="window.closeExtension ? window.closeExtension() : window.parent.postMessage({ type:'form:submitted', close:true }, '*')">
           Close
         </button>
-      `;
+      ;
     });
   </script>
 </body>
