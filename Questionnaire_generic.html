@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Vehicle Info Confirmation</title>
   <style>
-    /* — your existing CSS unchanged — */
+    /* …your existing CSS… */
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
@@ -89,12 +89,12 @@
     }
   </style>
 
-  <!-- Sunshine Conversations Webview SDK (unchanged) -->
+  <!-- Sunshine Conversations / Zendesk Webview SDK -->
   <script>
     ;(function(d,s,id){
       var js,fjs=d.getElementsByTagName(s)[0];
       if(d.getElementById(id))return;
-      js=d.createElement(s); js.id=id;
+      js=d.createElement(s);js.id=id;
       js.src="https://static.zdassets.com/conversation-extensions/latest/sdk.js";
       fjs.parentNode.insertBefore(js,fjs);
     })(document,"script","WebviewSdkScript");
@@ -108,88 +108,45 @@
     };
   </script>
 
-  <!-- 1) Official Web Messenger loader snippet — replace with YOUR web integration ID -->
+  <!-- Smooch Web Messenger SDK loader -->
   <script>
-  !function(o,d,s,e,f){
-    var i,a,p,c=[],h=[];
-    function t(){
-      var t="You must provide a supported major version.";
-      try{
-        if(!f) throw new Error(t);
-        var e,n="https://cdn.smooch.io/",r="smooch";
-        e="string"==typeof this.response?JSON.parse(this.response):this.response;
-        var o=f.match(/([0-9]+)\.?([0-9]+)?\.?([0-9]+)?/),
-            s=o&&o[1], i=o&&o[2], a=o&&o[3],
-            p=e["v"+s], c=e["v"+s+"."+i+".patch"];
-        if(e.url||p||c){
-          var h=d.getElementsByTagName("script")[0],
-              u=d.createElement("script");
-          u.async=!0;
-          if(a) u.src=c||n+r+"."+f+".min.js";
-          else {
-            if(!(5<=s&&p)) throw new Error(t);
-            u.src=p;
-          }
-          h.parentNode.insertBefore(u,h);
-        }
-      }catch(e){
-        e.message===t&&console.error(e);
-      }
+    const INTEGRATION_ID = '64f5a35e7e9cf2bd7bc34a37';  // your Web Messenger integration ID
+    let smoochReady = false;
+
+    function initSmooch() {
+      Smooch
+        .init({ integrationId: INTEGRATION_ID })
+        .then(() => {
+          console.log('✅ Smooch initialized');
+          smoochReady = true;
+        })
+        .catch(err => {
+          console.error('❌ Smooch.init failed:', err);
+          smoochReady = false;
+        });
     }
-    o[s]={
-      init:function(){ i=arguments;
-        var t={ then:function(e){return h.push({type:"t",next:e}),t},
-                catch:function(e){return h.push({type:"c",next:e}),t} };
-        return t;
-      },
-      on:function(){ c.push(arguments); },
-      render:function(){ a=arguments; },
-      destroy:function(){ p=arguments; }
-    };
-    o.__onWebMessengerHostReady__=function(e){
-      delete o.__onWebMessengerHostReady__;
-      o[s]=e;
-      if(i){
-        var t=e.init.apply(e,i);
-        for(var n=0;n<h.length;n++){
-          var r=h[n];
-          t="t"===r.type?t.then(r.next):t.catch(r.next);
-        }
-      }
-      a&&e.render.apply(e,a);
-      p&&e.destroy.apply(e,p);
-      for(n=0;n<c.length;n++) e.on.apply(e,c[n]);
-    };
-    var n=new XMLHttpRequest;
-    n.addEventListener("load",t);
-    n.open("GET","https://"+e+".webloader.smooch.io/",!0);
-    n.responseType="json";
-    n.send();
-  }(window,document,"Smooch","64f5a35e7e9cf2bd7bc34a37","5");
-  </script> :contentReference[oaicite:0]{index=0}
 
-  <!-- 2) Initialize the SDK (embedded mode) before using it -->
-  <script>
-    Smooch.init({
-      integrationId: '64f5a35e7e9cf2bd7bc34a37',
-      embedded: true
-    }).then(function() {
-      console.log('✅ Smooch initialized');
-    }).catch(function(err) {
-      console.error('❌ Smooch.init failed:', err);
-    });
-  </script> :contentReference[oaicite:1]{index=1}
-
+    ;(function loadSmoochSDK() {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.smooch.io/web/current/smooch.min.js';
+      s.onload = initSmooch;
+      s.onerror = () => {
+        console.error('❌ Failed to load Smooch SDK');
+        smoochReady = false;
+      };
+      document.head.appendChild(s);
+    })();
+  </script>
 </head>
-<body>
 
+<body>
   <form id="vehicleForm">
-    <!-- — your existing form markup unchanged — -->
     <h2>Vehicle Info Confirmation</h2>
+
     <!-- Tax Status -->
     <div class="form-group">
       <label>Is your vehicle taxed and not currently SORN/off the road?</label>
-      <select name="tax_status" onchange="toggleFollowUp(this,'taxFollowUp')">
+      <select name="tax_status" onchange="toggleFollowUp(this, 'taxFollowUp')">
         <option value="">Select an option</option>
         <option value="yes">Yes</option>
         <option value="no">No</option>
@@ -199,10 +156,11 @@
         <textarea name="tax_details" rows="3"></textarea>
       </div>
     </div>
-    <!-- Mileage -->
+
+    <!-- Mileage Confirmation -->
     <div class="form-group">
       <label>The mileage we have is 48,500. Is this correct?</label>
-      <select name="mileage_correct" onchange="toggleFollowUp(this,'mileageFollowUp')">
+      <select name="mileage_correct" onchange="toggleFollowUp(this, 'mileageFollowUp')">
         <option value="">Select an option</option>
         <option value="correct">Correct</option>
         <option value="incorrect">Incorrect</option>
@@ -212,10 +170,11 @@
         <input type="number" name="correct_mileage" min="0" step="1">
       </div>
     </div>
-    <!-- Mods -->
+
+    <!-- Modifications -->
     <div class="form-group">
       <label>Does the vehicle have any modifications beyond standard specification?</label>
-      <select name="modifications" onchange="toggleFollowUp(this,'modFollowUp')">
+      <select name="modifications" onchange="toggleFollowUp(this, 'modFollowUp')">
         <option value="">Select an option</option>
         <option value="no_mods">No</option>
         <option value="has_mods">Yes</option>
@@ -225,12 +184,14 @@
         <textarea name="modification_details" rows="3"></textarea>
       </div>
     </div>
+
     <!-- Purchase Date -->
     <div class="form-group">
       <label>Date of purchase:</label>
       <input type="date" name="purchase_date">
     </div>
-    <!-- Contact Method -->
+
+    <!-- Contact Preference -->
     <div class="form-group">
       <label>Preferred contact method:</label>
       <div class="radio-group">
@@ -239,12 +200,14 @@
         <label><input type="radio" name="contact_method" value="whatsapp"> WhatsApp</label>
       </div>
     </div>
+
     <!-- Email -->
     <div class="form-group">
       <label>Please enter your email address:</label>
       <input type="email" name="contact_email" placeholder="you@example.com">
     </div>
-    <!-- Referral Source -->
+
+    <!-- Referral source -->
     <div class="form-group">
       <label>How did you hear about Motorway?</label>
       <div class="checkbox-group">
@@ -255,7 +218,8 @@
         <label><input type="checkbox" name="services" value="Other"> Other</label>
       </div>
     </div>
-    <!-- Features -->
+
+    <!-- Features multi-select -->
     <div class="form-group">
       <label>What features does your vehicle have? (Ctrl/Cmd-click for multiple)</label>
       <select name="favourite_features" multiple size="4">
@@ -265,17 +229,20 @@
         <option value="sound">Premium sound</option>
       </select>
     </div>
-    <!-- Photo Upload -->
+
+    <!-- Photo upload -->
     <div class="form-group">
       <label>Upload a photo of your vehicle’s proof of purchase:</label>
       <input type="file" name="vehicle_photo" accept="image/*">
     </div>
-    <!-- Satisfaction Slider -->
+
+    <!-- Satisfaction slider + emoji -->
     <div class="form-group range-group">
       <label for="satisfaction">How satisfied are you overall? (1 = low, 5 = high)</label>
-      <input type="range" name="satisfaction" id="satisfaction" min="1" max="5" step="1" value="3">
+      <input type="range" name="satisfaction" id="satisfaction" min="1" max="5" step="1" value="3" />
       <div id="satisfactionEmoji" class="emoji-display">😐</div>
     </div>
+
     <button type="submit">Submit</button>
   </form>
 
@@ -287,7 +254,6 @@
         : 'none';
     }
 
-    // Emoji slider logic (unchanged)
     const emojiMap = {1:'😞',2:'😕',3:'😐',4:'🙂',5:'😃'};
     const slider = document.getElementById('satisfaction');
     const emojiEl = document.getElementById('satisfactionEmoji');
@@ -296,25 +262,26 @@
     });
     emojiEl.textContent = emojiMap[slider.value];
 
-    // Submission: build summary, send via Smooch.sendMessage, then close
     document.getElementById('vehicleForm').addEventListener('submit', async function(e) {
       e.preventDefault();
+
+      // 1) Gather data
       const formData = new FormData(this);
       const data = {};
       formData.forEach((v,k) => {
         data[k] = data[k] ? [].concat(data[k], v) : v;
       });
 
-      // Build a plain-text summary
-      const lines = ['Vehicle Info:'];
-      lines.push(`– Tax: ${data.tax_status}${data.tax_details?` (${data.tax_details})`:''}`);
-      lines.push(`– Mileage: ${data.mileage_correct}${data.correct_mileage?` (${data.correct_mileage})`:''}`);
-      lines.push(`– Mods: ${data.modifications}${data.modification_details?` (${data.modification_details})`:''}`);
-      if (data.purchase_date)      lines.push(`– Purchase date: ${data.purchase_date}`);
-      if (data.contact_method)     lines.push(`– Contact via: ${data.contact_method}`);
-      if (data.contact_email)      lines.push(`– Email: ${data.contact_email}`);
+      // 2) Build summary text
+      const lines = ['📋 Vehicle Info:'];
+      lines.push(`– Tax: ${data.tax_status}` + (data.tax_details ? ` (${data.tax_details})` : ''));
+      lines.push(`– Mileage: ${data.mileage_correct}` + (data.correct_mileage ? ` (${data.correct_mileage})` : ''));
+      lines.push(`– Mods: ${data.modifications}` + (data.modification_details ? ` (${data.modification_details})` : ''));
+      if (data.purchase_date)        lines.push(`– Purchase date: ${data.purchase_date}`);
+      if (data.contact_method)       lines.push(`– Contact via: ${data.contact_method}`);
+      if (data.contact_email)        lines.push(`– Email: ${data.contact_email}`);
       if (data.services) {
-        const svc = Array.isArray(data.services) ? data.services : [data.services];
+        const svc = Array.isArray(data.services)?data.services:[data.services];
         lines.push(`– Heard via: ${svc.join(', ')}`);
       }
       if (data.favourite_features) {
@@ -323,25 +290,29 @@
           : [data.favourite_features];
         lines.push(`– Features: ${feats.join(', ')}`);
       }
-      if (data.vehicle_photo?.name) lines.push(`– Photo: ${data.vehicle_photo.name}`);
-      if (data.satisfaction)       lines.push(`– Satisfaction: ${data.satisfaction}/5`);
+      if (data.vehicle_photo?.name)  lines.push(`– Photo: ${data.vehicle_photo.name}`);
+      if (data.satisfaction)         lines.push(`– Satisfaction: ${data.satisfaction}/5`);
       const summary = lines.join('\n');
 
-      // Send as a user message
-      try {
-        await Smooch.sendMessage({ type:'text', text: summary });
-      } catch(err) {
-        console.error('Failed to send message via Smooch:', err);
+      // 3) Try sending via Smooch; fallback to postMessage
+      if (smoochReady && typeof Smooch.sendMessage === 'function') {
+        try {
+          await Smooch.sendMessage({ type:'text', text: summary });
+        } catch(err) {
+          console.error('⚠️ Smooch.sendMessage failed:', err);
+          window.parent.postMessage({ type:'form:submitted', data, summary, close:true }, '*');
+        }
+      } else {
+        console.warn('⚠️ Smooch not ready—using fallback');
+        window.parent.postMessage({ type:'form:submitted', data, summary, close:true }, '*');
       }
 
-      // Close the webview
+      // 4) Close the webview
       if (window.closeExtension) {
         window.closeExtension();
-      } else {
-        window.parent.postMessage({ type:'form:submitted', data, close:true }, '*');
       }
 
-      // Show thank-you
+      // 5) Replace with thank-you
       this.innerHTML = `
         <h2>Thank you!</h2>
         <p>Your information has been submitted.</p>
