@@ -107,39 +107,145 @@
     };
   </script>
 
-  <!-- Smooch Web Messenger SDK - official loader snippet -->
+  <!-- Smooch Web Messenger SDK -->
   <script>
-  ;(function(window, document, url){
-    window.Smooch = window.Smooch || { _q: [] };
-    window.Smooch.init = function() { window.Smooch._q.push(['init', arguments]); };
-    window.Smooch.on = function()  { window.Smooch._q.push(['on', arguments]); };
+    const INTEGRATION_ID = '64f5a35e7e9cf2bd7bc34a37';  // your Web Messenger integration ID
+    let smoochReady = false;
 
-    var script = document.createElement('script');
-    script.async = true;
-    script.src = url;
-    var first = document.getElementsByTagName('script')[0];
-    first.parentNode.insertBefore(script, first);
-  })(window, document, 'https://cdn.smooch.io/web/current/smooch.min.js');
-  </script>
+    function initSmooch() {
+      Smooch
+        .init({ integrationId: INTEGRATION_ID })
+        .then(() => {
+          console.log('✅ Smooch initialized');
+          smoochReady = true;
+        })
+        .catch(err => console.error('❌ Smooch.init failed:', err));
+    }
 
-  <script>
-    // Initialize once the loader has been injected
-    Smooch.init({
-      integrationId: '64f5a35e7e9cf2bd7bc34a37',
-      region: 'eu-1'
-    })
-    .then(() => {
-      console.log('✅ Smooch initialized');
-      smoochReady = true;
-    })
-    .catch(err => console.error('❌ Smooch.init failed:', err));
+    // Inject the SDK script and call init once it's loaded
+    ;(function loadSmoochSDK() {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.smooch.io/web/current/smooch.min.js';
+      s.onload = initSmooch;
+      s.onerror = () => console.error('❌ Failed to load Smooch SDK');
+      document.head.appendChild(s);
+    })();
   </script>
 </head>
 <body>
 
   <form id="vehicleForm">
     <h2>Vehicle Info Confirmation</h2>
-    <!-- ... rest of form unchanged ... -->
+
+    <!-- Tax Status -->
+    <div class="form-group">
+      <label>Is your vehicle taxed and not currently SORN/off the road?</label>
+      <select name="tax_status" onchange="toggleFollowUp(this, 'taxFollowUp')">
+        <option value="">Select an option</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+      <div id="taxFollowUp" class="follow-up">
+        <label>Please provide more details about the vehicle's status:</label>
+        <textarea name="tax_details" rows="3"></textarea>
+      </div>
+    </div>
+
+    <!-- Mileage Confirmation -->
+    <div class="form-group">
+      <label>The mileage we have is 48,500. Is this correct?</label>
+      <select name="mileage_correct" onchange="toggleFollowUp(this, 'mileageFollowUp')">
+        <option value="">Select an option</option>
+        <option value="correct">Correct</option>
+        <option value="incorrect">Incorrect</option>
+      </select>
+      <div id="mileageFollowUp" class="follow-up">
+        <label>Please enter the correct mileage:</label>
+        <input type="number" name="correct_mileage" min="0" step="1">
+      </div>
+    </div>
+
+    <!-- Modifications -->
+    <div class="form-group">
+      <label>Does the vehicle have any modifications beyond standard specification?</label>
+      <select name="modifications" onchange="toggleFollowUp(this, 'modFollowUp')">
+        <option value="">Select an option</option>
+        <option value="no_mods">No</option>
+        <option value="has_mods">Yes</option>
+      </select>
+      <div id="modFollowUp" class="follow-up">
+        <label>Please describe the modifications:</label>
+        <textarea name="modification_details" rows="3"></textarea>
+      </div>
+    </div>
+
+    <!-- Purchase Date -->
+    <div class="form-group">
+      <label>Date of purchase:</label>
+      <input type="date" name="purchase_date">
+    </div>
+
+    <!-- Contact Preference -->
+    <div class="form-group">
+      <label>Preferred contact method:</label>
+      <div class="radio-group">
+        <label><input type="radio" name="contact_method" value="email"> Email</label>
+        <label><input type="radio" name="contact_method" value="phone"> Phone</label>
+        <label><input type="radio" name="contact_method" value="whatsapp"> WhatsApp</label>
+      </div>
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+      <label>Please enter your email address:</label>
+      <input type="email" name="contact_email" placeholder="you@example.com">
+    </div>
+
+    <!-- Referral source -->
+    <div class="form-group">
+      <label>How did you hear about Motorway?</label>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="services" value="TV advert"> TV advert</label>
+        <label><input type="checkbox" name="services" value="Radio"> Radio</label>
+        <label><input type="checkbox" name="services" value="Word of Mouth"> Word-of-Mouth</label>
+        <label><input type="checkbox" name="services" value="Internet Search"> Internet Search</label>
+        <label><input type="checkbox" name="services" value="Other"> Other</label>
+      </div>
+    </div>
+
+    <!-- Features multi-select -->
+    <div class="form-group">
+      <label>What features does your vehicle have? (Ctrl/Cmd-click for multiple)</label>
+      <select name="favourite_features" multiple size="4">
+        <option value="gps">Built-in GPS</option>
+        <option value="sunroof">Sunroof</option>
+        <option value="heating">Heated seats</option>
+        <option value="sound">Premium sound</option>
+      </select>
+    </div>
+
+    <!-- Photo upload -->
+    <div class="form-group">
+      <label>Upload a photo of your vehicle’s proof of purchase:</label>
+      <input type="file" name="vehicle_photo" accept="image/*">
+    </div>
+
+    <!-- Satisfaction slider + emoji -->
+    <div class="form-group range-group">
+      <label for="satisfaction">How satisfied are you overall? (1 = low, 5 = high)</label>
+      <input 
+        type="range" 
+        name="satisfaction" 
+        id="satisfaction"
+        min="1" 
+        max="5" 
+        step="1" 
+        value="3"
+      >
+      <div id="satisfactionEmoji" class="emoji-display">😐</div>
+    </div>
+
+    <button type="submit">Submit</button>
   </form>
 
   <script>
@@ -156,12 +262,21 @@
       }
     }
 
-    const emojiMap = { 1:'😞',2:'😕',3:'😐',4:'🙂',5:'😃' };
+    const emojiMap = {
+      1: '😞',
+      2: '😕',
+      3: '😐',
+      4: '🙂',
+      5: '😃'
+    };
     const slider = document.getElementById('satisfaction');
     const emojiEl = document.getElementById('satisfactionEmoji');
-    slider.addEventListener('input', e => emojiEl.textContent = emojiMap[e.target.value]);
+    slider.addEventListener('input', e => {
+      emojiEl.textContent = emojiMap[e.target.value] || '';
+    });
     emojiEl.textContent = emojiMap[slider.value];
 
+    // Handle form submission
     document.getElementById('vehicleForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
