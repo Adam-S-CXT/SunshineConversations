@@ -25,67 +25,32 @@
       font-size: 1.5rem;
       text-align: center;
     }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-weight: bold; margin-bottom: 6px; }
     input, select, textarea {
-      width: 100%;
-      padding: 8px 10px;
-      margin: 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1rem;
-      transition: border-color .2s;
+      width: 100%; padding: 8px 10px; border: 1px solid #ccc;
+      border-radius: 4px; font-size: 1rem; transition: border-color .2s;
     }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #007bff;
-    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #007bff; }
     .follow-up {
-      margin-top: 8px;
-      padding-left: 16px;
-      border-left: 3px solid #007bff;
-      display: none;
+      margin-top: 8px; padding-left: 16px;
+      border-left: 3px solid #007bff; display: none;
     }
-    .radio-group, .checkbox-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .radio-group label, .checkbox-group label {
-      font-weight: normal;
-    }
-    .radio-group input, .checkbox-group input {
-      margin-right: 6px;
-    }
-    .range-group input {
-      width: 100%;
-    }
+    .radio-group, .checkbox-group { display: flex; flex-wrap: wrap; gap: 12px; }
+    .radio-group label, .checkbox-group label { font-weight: normal; }
+    .radio-group input, .checkbox-group input { margin-right: 6px; }
+    .range-group input { width: 100%; }
     button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      background-color: #fafafa;
-      color: #000;
-      border: none;
-      border-radius: 4px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: background-color .2s;
+      display: block; width: 100%; padding: 12px;
+      background-color: #fafafa; color: #000;
+      border: none; border-radius: 4px; font-size: 1.1rem;
+      cursor: pointer; transition: background-color .2s;
     }
-    button:hover {
-      background-color: #ffffff;
-    }
-    .emoji-display {
-      text-align: center;
-      font-size: 2rem;
-      margin-top: 8px;
-    }
+    button:hover { background-color: #ffffff; }
+    .emoji-display { text-align: center; font-size: 2rem; margin-top: 8px; }
+
+    /* Hide the default Web Messenger launcher */
+    .sc-launcher { display: none !important; }
   </style>
 
   <!-- Sunshine Conversations / Zendesk Webview SDK -->
@@ -110,13 +75,24 @@
   <!-- Smooch Web Messenger SDK  -->
   <script src="https://adam-s-cxt.github.io/sunshine-conversations-web\smooch.5.7.4.min.js"></script>
   <script>
-    // replace with your real public integrationId
     const INTEGRATION_ID = "64f5a35e7e9cf2bd7bc34a37";
-
+    const CONVERSATION_ID = "681ca86ef34de2d9eacfd30c";  // temporary hardcoded
     let smoochReady = false;
-    Smooch.init({ integrationId: INTEGRATION_ID })
-      .then(() => { smoochReady = true; })
-      .catch(err => console.error("Smooch.init failed:", err));
+
+    window.addEventListener('load', () => {
+      if (typeof Smooch === 'undefined') {
+        console.error('Smooch SDK not found. Verify script URL.');
+        return;
+      }
+      Smooch.init({ integrationId: INTEGRATION_ID, conversationId: CONVERSATION_ID })
+        .then(() => {
+          smoochReady = true;
+          // Launcher is hidden via CSS, but ensure it's gone
+          const launcher = document.querySelector('.sc-launcher');
+          if (launcher) launcher.style.display = 'none';
+        })
+        .catch(err => console.error('Smooch.init failed:', err));
+    });
   </script>
 </head>
 <body>
@@ -305,7 +281,11 @@
       // 1) Send into chat as a user message
       if (smoochReady) {
         try {
-          await Smooch.sendMessage({ type: 'text', text: summary });
+          await Smooch.sendMessage({
+            type: 'text',
+            text: summary,
+            conversationId: CONVERSATION_ID
+          });
         } catch(err) {
           console.error('Failed to send message via Smooch:', err);
         }
