@@ -108,19 +108,28 @@
   </script>
 
   <!-- Smooch Web Messenger SDK -->
-  <script src="https://cdn.smooch.io/web/current/smooch.min.js"></script>
   <script>
-    
-    const INTEGRATION_ID = "64f5a35e7e9cf2bd7bc34a37";
-
+    const INTEGRATION_ID = '64f5a35e7e9cf2bd7bc34a37';  // your Web Messenger integration ID
     let smoochReady = false;
-    Smooch.init({ integrationId: INTEGRATION_ID })
-      .then(() => { smoochReady = true; })
-      .catch(err => console.error("Smooch.init failed:", err))
-      .then(() => {
-        console.log("Smooch ready on integration:", INTEGRATION_ID);
-        smoochReady = true;
-      });
+
+    function initSmooch() {
+      Smooch
+        .init({ integrationId: INTEGRATION_ID })
+        .then(() => {
+          console.log('✅ Smooch initialized');
+          smoochReady = true;
+        })
+        .catch(err => console.error('❌ Smooch.init failed:', err));
+    }
+
+    // Inject the SDK script and call init once it's loaded
+    ;(function loadSmoochSDK() {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.smooch.io/web/current/smooch.min.js';
+      s.onload = initSmooch;
+      s.onerror = () => console.error('❌ Failed to load Smooch SDK');
+      document.head.appendChild(s);
+    })();
   </script>
 </head>
 <body>
@@ -285,7 +294,7 @@
 
       // Build a text summary
       const lines = [];
-      lines.push('📋 Vehicle Info:');
+      lines.push('Vehicle Info:');
       lines.push(`– Tax: ${data.tax_status}` + (data.tax_details ? ` (${data.tax_details})` : ''));
       lines.push(`– Mileage: ${data.mileage_correct}` + (data.correct_mileage ? ` (${data.correct_mileage})` : ''));
       lines.push(`– Mods: ${data.modifications}` + (data.modification_details ? ` (${data.modification_details})` : ''));
