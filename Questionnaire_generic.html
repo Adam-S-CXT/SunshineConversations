@@ -111,12 +111,16 @@
   <script src="https://cdn.smooch.io/web/current/smooch.min.js"></script>
   <script>
     
-    const INTEGRATION_ID = "667c23abe4c9a72a66488de9";
+    const INTEGRATION_ID = "64f5a35e7e9cf2bd7bc34a37";
 
     let smoochReady = false;
     Smooch.init({ integrationId: INTEGRATION_ID })
       .then(() => { smoochReady = true; })
-      .catch(err => console.error("Smooch.init failed:", err));
+      .catch(err => console.error("Smooch.init failed:", err))
+      .then(() => {
+        console.log("Smooch ready on integration:", INTEGRATION_ID);
+        smoochReady = true;
+      });
   </script>
 </head>
 <body>
