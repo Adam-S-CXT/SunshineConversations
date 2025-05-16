@@ -107,15 +107,21 @@
     };
   </script>
 
-  <!-- Sunshine Conversations Web Messenger Loader -->
+  <!-- Smooch Web Messenger SDK  -->
   <script>
-    !function(o,p){
-      var c=p.createElement("script");
-      c.src="https://cdn.smooch.io/webloader/loader.js";
-      c.async=!0;
-      var e=p.getElementsByTagName("script")[0];
-      e.parentNode.insertBefore(c,e);
-    }(window, document);
+  src="https://raw.githubusercontent.com/zendesk/sunshine-conversations-web/v5.7.4/smooch.5.7.4.min.js"
+  integrity="sha384-<calculated-SRI-hash>"
+  crossorigin="anonymous"
+  </script>
+
+  <script>
+    // replace with your real public integrationId
+    const INTEGRATION_ID = "64f5a35e7e9cf2bd7bc34a37";
+
+    let smoochReady = false;
+    Smooch.init({ integrationId: INTEGRATION_ID })
+      .then(() => { smoochReady = true; })
+      .catch(err => console.error("Smooch.init failed:", err));
   </script>
 </head>
 <body>
@@ -234,20 +240,6 @@
     <button type="submit">Submit</button>
   </form>
 
-  <!-- Initialize Web Messenger after loader -->
-  <script>
-    // replace with real public integrationId
-    const INTEGRATION_ID = "64f5a35e7e9cf2bd7bc34a37";
-    let smoochReady = false;
-
-    window.addEventListener('load', () => {
-      Smooch.init({ integrationId: INTEGRATION_ID })
-        .then(() => { smoochReady = true; })
-        .catch(err => console.error("Smooch.init failed:", err));
-    });
-  </script>
-
-  <!-- form submission -->
   <script>
     function toggleFollowUp(selectElem, followUpId) {
       const el = document.getElementById(followUpId);
@@ -263,7 +255,11 @@
     }
 
     const emojiMap = {
-      1: '😞', 2: '😕', 3: '😐', 4: '🙂', 5: '😃'
+      1: '😞',
+      2: '😕',
+      3: '😐',
+      4: '🙂',
+      5: '😃'
     };
     const slider = document.getElementById('satisfaction');
     const emojiEl = document.getElementById('satisfactionEmoji');
