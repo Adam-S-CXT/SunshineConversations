@@ -200,7 +200,10 @@
         console.error('Smooch SDK not found. Verify script URL.');
         return;
       }
-      Smooch.init({ integrationId: INTEGRATION_ID })
+      Smooch.init({ 
+        integrationId: INTEGRATION_ID,
+        configBaseUrl: 'https://api.smooch.io/v2/apps/'
+      })
         .then(() => Smooch.loadConversation(CONVERSATION_ID))
         .then(() => {
           smoochReady = true;
