@@ -191,6 +191,12 @@
   <script src="https://adam-s-cxt.github.io/sunshine-conversations-web/smooch.5.7.4.min.js"></script>
 
   <script>
+    const INTEGRATION_ID = "64f5a35e7e9cf2bd7bc34a37";
+    const CONVERSATION_ID = "681ca86ef34de2d9eacfd30c";  // temporary hardcoded
+    let smoochReady = true;
+  </script>
+
+  <script>
     function toggleFollowUp(selectElem, followUpId) {
       const el = document.getElementById(followUpId);
       if (
@@ -259,7 +265,7 @@
         try {
           await Smooch.sendMessage(
             { type: 'text', text: summary },
-            '681ca86ef34de2d9eacfd30c'
+            CONVERSATION_ID
           );
         } catch(err) {
           console.error('Failed to send message via Smooch:', err);
