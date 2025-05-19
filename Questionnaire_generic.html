@@ -201,8 +201,7 @@
         return;
       }
       Smooch.init({ 
-        integrationId: INTEGRATION_ID,
-        configBaseUrl: 'https://motorway-dev.zendesk.com/sc/'
+        integrationId: INTEGRATION_ID
       })
         .then(() => Smooch.loadConversation(CONVERSATION_ID))
         .then(() => {
