@@ -246,17 +246,22 @@
           return;
         }
         Smooch.init({
-          integrationId: INTEGRATION_ID,
-          region: 'eu-1',       // use your region or configBaseUrl for Zendesk
-          embedded: true        // disable auto-rendering
+        integrationId: INTEGRATION_ID,
+        configBaseUrl: 'https://motorway-dev.zendesk.com/sc/',
+        embedded: true
+      })
+        .then(cfg => {
+          console.log('init resolved, config:', cfg);
+          return Smooch.loadConversation(CONVERSATION_ID);
         })
-        .then(() => Smooch.loadConversation(CONVERSATION_ID))
-        .then(() => {
+        .then(conv => {
+          console.log('oadConversation resolved, conversation:', conv);
           window.smoochReady = true;
-          console.log('[Smooch] SDK ready, conversation loaded');
         })
-        .catch(err => console.error('Smooch.init or loadConversation failed:', err));
-      });
+        .catch(err => {
+          console.error('init or loadConversation failed:', err);
+        });
+
     })();
   </script>
 
