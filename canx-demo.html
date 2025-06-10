@@ -105,12 +105,24 @@
 
     <div class="form-group">
       <label>Reason for form</label>
-      <textarea name="form_reason" rows="2"></textarea>
+      <select name="reason_for_form">
+        <option value="">Select an option</option>
+        <option value="add_damage">Additional Damage</option>
+        <option value="mech_fault">Mechanical Fault</option>
+        <option value="doc_issue">Document Issue</option>
+        <option value="withdraw_bid">Withdrawing Bid</option>
+        <option value="sell_reason">Seller Reason</option>
+      </select>
     </div>
 
     <div class="form-group">
-      <label>Seller Reason</label>
+      <label>Please tell us more about the Price Adjustment or Cancellation</label>
       <textarea name="seller_reason" rows="2"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Attachments:</label>
+      <input type="file" name="canx_attach">
     </div>
 
     <button id="submitBtn" type="submit" disabled>Submit</button>
