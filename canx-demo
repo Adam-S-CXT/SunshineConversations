@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Cancellation Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f2f4f7;
+      color: #333;
+    }
+    form {
+      background: #ffeb7c;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: auto;
+    }
+    h2 {
+      margin-bottom: 24px;
+      color: #0053a0;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-weight: bold; margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%; padding: 8px 10px; border: 1px solid #ccc;
+      border-radius: 4px; font-size: 1rem; transition: border-color .2s;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #007bff; }
+    button {
+      display: block; width: 100%; padding: 12px;
+      background-color: #fafafa; color: #000;
+      border: none; border-radius: 4px; font-size: 1.1rem;
+      cursor: pointer; transition: background-color .2s;
+    }
+    button:hover { background-color: #ffffff; }
+    .sc-launcher, .sc-widget, .sk-launcher, #sk-holder iframe { display: none !important; }
+  </style>
+
+  <!-- Sunshine Conversations / Zendesk Webview SDK -->
+  <script>
+    ;(function(d,s,id){
+      var js,fjs=d.getElementsByTagName(s)[0];
+      if(d.getElementById(id)) return;
+      js=d.createElement(s); js.id=id;
+      js.src="https://static.zdassets.com/conversation-extensions/latest/sdk.js";
+      fjs.parentNode.insertBefore(js,fjs);
+    })(document,"script","WebviewSdkScript");
+
+    window.webviewSdkInit = function(WebviewSdk) {
+      if (WebviewSdk.hasFeature("close")) {
+        window.closeExtension = WebviewSdk.close.bind(WebviewSdk);
+      } else {
+        console.warn("Close not supported on this channel");
+      }
+    };
+  </script>
+</head>
+<body>
+
+  <form id="cancelForm">
+    <h2>Cancellation / Price Adjustment</h2>
+
+    <div class="form-group">
+      <label>Price adjustment or cancellation</label>
+      <select name="adjust_or_cancel">
+        <option value="">Select an option</option>
+        <option value="price_adjustment">Price adjustment</option>
+        <option value="cancellation">Cancellation</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>On site?</label>
+      <select name="on_site">
+        <option value="">Select an option</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Vehicle VRM</label>
+      <input type="text" name="vehicle_vrm" placeholder="AB12 CDE">
+    </div>
+
+    <div class="form-group">
+      <label>Dealership name</label>
+      <input type="text" name="dealership_name">
+    </div>
+
+    <div class="form-group">
+      <label>Was a price adjustment attempted?</label>
+      <select name="price_adjustment_attempted">
+        <option value="">Select an option</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Reason for form</label>
+      <textarea name="form_reason" rows="2"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Seller Reason</label>
+      <textarea name="seller_reason" rows="2"></textarea>
+    </div>
+
+    <button id="submitBtn" type="submit" disabled>Submit</button>
+  </form>
+
+  <script src="https://adam-s-cxt.github.io/sunshine-conversations-web/smooch.5.7.4.min.js"></script>
+
+  <script>
+    // 1) Monkey-patch fetch to log Smooch API calls
+    (function(){
+      const origFetch = window.fetch;
+      window.fetch = function(resource, options) {
+        if (typeof resource === 'string' && resource.includes('/conversations/')) {
+          console.group('[fetch]');
+          console.log('→ URL:', resource);
+          console.log('→ options:', options);
+        }
+        return origFetch(resource, options).then(response => {
+          if (response.url && response.url.includes('/conversations/')) {
+            console.log('← status:', response.status, response.statusText);
+            response.clone().text().then(text => console.log('← body:', text));
+            console.groupEnd();
+          }
+          return response;
+        });
+      };
+    })();
+
+    // 2) Wrap key Smooch methods to log arguments and results
+    (function(){
+      if (!window.Smooch) return;
+      function wrap(fnName) {
+        const original = Smooch[fnName];
+        if (!original) return;
+        Smooch[fnName] = function(...args) {
+          console.group(`[Smooch] ${fnName}`);
+          console.log('→ arguments:', args);
+          const result = original.apply(this, args);
+          if (result && typeof result.then === 'function') {
+            result.then(res => { console.log('✓ resolved:', res); console.groupEnd(); return res; })
+                  .catch(err => { console.error('✗ rejected:', err); console.groupEnd(); throw err; });
+          } else {
+            console.log('✓ returned sync value:', result);
+            console.groupEnd();
+          }
+          return result;
+        };
+      }
+      ['init','loadConversation','sendMessage','getConversationById'].forEach(wrap);
+      if (Smooch.on) {
+        Smooch.on('*', (event, payload) => console.log(`[event:${event}]`, payload));
+      }
+    })();
+
+    // 3) Initialize the SDK without rendering the widget, then load the conversation
+    (function(){
+      const INTEGRATION_ID  = "64f5a35e7e9cf2bd7bc34a37";
+      const CONVERSATION_ID = "681ca86ef34de2d9eacfd30c";
+      window.smoochReady = false;
+
+      window.addEventListener('load', () => {
+        if (typeof Smooch === 'undefined') {
+          console.error('Smooch SDK not loaded');
+          return;
+        }
+        Smooch.init({
+          integrationId: INTEGRATION_ID,
+          configBaseUrl: 'https://motorway-dev.zendesk.com/sc/',
+          embedded: true
+        })
+        .then(cfg => {
+          console.log('✅ init resolved, config:', cfg);
+          return Smooch.loadConversation(CONVERSATION_ID);
+        })
+        .then(conv => {
+          console.log('✅ loadConversation resolved, conversation:', conv);
+          window.smoochReady = true;
+          document.getElementById('submitBtn').disabled = false;
+        })
+        .catch(err => {
+          console.error('❌ init or loadConversation failed:', err);
+        });
+      });
+    })();
+
+
+
+    // Handle form submission
+    document.getElementById('cancelForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const data = {};
+      formData.forEach((v, k) => { data[k] = v; });
+
+      const lines = [];
+      lines.push('📋 Cancellation/Adjustment:');
+      if (data.adjust_or_cancel)           lines.push(`– Type: ${data.adjust_or_cancel}`);
+      if (data.on_site)                    lines.push(`– On site: ${data.on_site}`);
+      if (data.vehicle_vrm)               lines.push(`– VRM: ${data.vehicle_vrm}`);
+      if (data.dealership_name)           lines.push(`– Dealer: ${data.dealership_name}`);
+      if (data.price_adjustment_attempted) lines.push(`– Adjustment attempted: ${data.price_adjustment_attempted}`);
+      if (data.form_reason)               lines.push(`– Reason for form: ${data.form_reason}`);
+      if (data.seller_reason)             lines.push(`– Seller reason: ${data.seller_reason}`);
+      const summary = lines.join('\n');
+      console.log('[Form] summary to send:', summary);
+
+      if (window.smoochReady) {
+        try {
+          const sendRes = await Smooch.sendMessage(
+            { type: 'text', text: summary },
+            CONVERSATION_ID
+          );
+          console.log('[Form] sendMessage result:', sendRes);
+
+          const conv = await Smooch.getConversationById(CONVERSATION_ID);
+          console.log('[Form] current conversation.messages:', conv.messages);
+        } catch(err) {
+          console.error('Failed to send message via Smooch:', err);
+        }
+      } else {
+        console.warn('Smooch SDK not ready, cannot send message');
+      }
+
+      if (window.closeExtension) {
+        window.closeExtension();
+      } else {
+        window.parent.postMessage({ type: 'form:submitted', data, close: true }, '*');
+      }
+
+      this.innerHTML = `
+        <h2>Thank you!</h2>
+        <p>Your cancellation request has been submitted.</p>
+        <button onclick="window.closeExtension ? window.closeExtension() : window.parent.postMessage({ type:'form:submitted', close:true }, '*')">Close</button>
+      `;
+    });
+  </script>
+
+</body>
+</html>
